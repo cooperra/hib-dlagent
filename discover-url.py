@@ -12,8 +12,14 @@ client = humblebundle.HumbleApi()
 try:
     client.login(username, password)
 except humblebundle.exceptions.HumbleTwoFactorException as e:
-    print(e, end=': ', file=sys.stderr)
-    client.login(username, password, input())
+    print("Two-factor token", end=': ', file=sys.stderr)
+    token=input()
+    if e.authy_required:
+        client.login(username, password, authy_token=token)
+    elif e.guard_required:
+        client.login(username, password, guard_token=token)
+    else:
+        raise
 except humblebundle.exceptions.HumbleAuthenticationException as e:
     print(e, file=sys.stderr)
     exit()
